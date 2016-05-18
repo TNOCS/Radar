@@ -59,7 +59,7 @@ module TechRadar {
         radius?: number;
         innerradius?: number;
         margin?: { top: number; right: number; bottom: number; left: number; };
-        render(technologies: Technology[], renderOptions?: RenderOptions): void;
+        render(config: csComp.Services.SpreadsheetService, renderOptions?: RenderOptions): void;
         setItemVisibility(technologies: Technology, isVisible: boolean): void;
     }
 
@@ -78,7 +78,7 @@ module TechRadar {
                     restrict: 'EA',       // E = elements, other options are A=attributes and C=classes
                     transclude: true,
                     scope: {
-                        technologies: '=',  // = means that we use angular to evaluate the expression,
+                        config: '=',  // = means that we use angular to evaluate the expression,
                         options: '=',
                         searchterm: '=',
                         prioritylevel: '=',
@@ -150,7 +150,7 @@ module TechRadar {
                             }
                         })
 
-                        scope.render = (technologies: Technology[], renderOptions?: RenderOptions) => {
+                        scope.render = (config : csComp.Services.SpreadsheetService, renderOptions?: RenderOptions) => {
                             d3.select(element[0]).selectAll("*").remove();
                             var chart = d3.select(element[0])
                                 .append('svg:svg')
@@ -187,7 +187,13 @@ module TechRadar {
                             } = {};
                             var filteredTechnologies: Technology[] = [];
                             
+                            
+                            
                             return;
+                            
+                            // config.sheets.Technologies.forEach(t=>{
+                                 
+                            // })
 
                             technologies.forEach((t) => {
                                 var include = true;

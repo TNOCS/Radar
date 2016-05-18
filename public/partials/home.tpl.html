@@ -16,7 +16,7 @@
 
     <div class="container-fluid" style="padding: 0 0 0 0">
         <div class="col-md-6">
-            <tech-radar-chart technologies="vm.technologies" searchterm="searchText" prioritylevel="tech.priority" options="vm.options"
+            <tech-radar-chart config="vm.data" searchterm="searchText" prioritylevel="tech.priority" options="vm.options"
                 startangle="-90" endangle="270"></tech-radar-chart>
         </div>
         <!--<div class="col-md-6" style="background:#bdbdbd;margin:0;width:55%;height:100%;padding:0">
@@ -54,7 +54,7 @@
                     <!-- Tab panes -->
                     <div class="tab-content ">
                          <div class="tab-pane active" id="config">
-                             <h1>config</h1>
+                             <h1>Filter</h1>
                              <div ng-repeat="f in vm.data.activeConfig.Filters">                                  
                                   <div>{{f.Visual}}</div>
                                   <div>{{f.Dimension}}</div>
