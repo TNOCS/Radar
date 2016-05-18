@@ -72,7 +72,7 @@ module TechRadar {
       */
     myModule
         .directive('techRadarChart', ['$filter', 'busService',
-            function($filter: ng.IFilterService, bus: csComp.Services.MessageBusService): ng.IDirective {
+            ($filter: ng.IFilterService, bus: csComp.Services.MessageBusService): ng.IDirective => {
                 return {
                     terminal: true,       // do not compile any other internal directives
                     restrict: 'EA',       // E = elements, other options are A=attributes and C=classes
@@ -88,7 +88,7 @@ module TechRadar {
                         innerradius: '@',
                         margin: '@'
                     },
-                    link: function(scope: ITechRadarChartScope, element, attrs) {
+                    link: (scope: ITechRadarChartScope, element, attrs) => {
                         const rad2deg = 180 / Math.PI;
                         var parent = $(element[0]).parent();
                         var margin = scope.margin || { top: 15, right: 25, bottom: 15, left: 25 };
@@ -134,23 +134,23 @@ module TechRadar {
 
                         var priorityFill = ((prio) => {
                             switch (parseInt(prio)) {
-                                case 1: return "#F39092"; break;
-                                case 2: return "#9EBACB"; break;
-                                case 3: return "#F5DC8F"; break;
-                                default: return "#DFE0DC"; break;
+                                case 1: return "#F39092";
+                                case 2: return "#9EBACB"; 
+                                case 3: return "#F5DC8F"; 
+                                default: return "#DFE0DC"; 
                             }
                         });
 
                         var priorityStroke = ((prio) => {
                             switch (prio) {
-                                case "1": return "#CC3A31"; break;
-                                case "2": return "#9193AF"; break;
-                                case "3": return "yellow"; break;
-                                default: return "gray"; break;
+                                case "1": return "#CC3A31"; 
+                                case "2": return "#9193AF"; 
+                                case "3": return "yellow"; 
+                                default: return "gray"; 
                             }
                         })
 
-                        scope.render = function(technologies: Technology[], renderOptions?: RenderOptions) {
+                        scope.render = (technologies: Technology[], renderOptions?: RenderOptions) => {
                             d3.select(element[0]).selectAll("*").remove();
                             var chart = d3.select(element[0])
                                 .append('svg:svg')
@@ -186,6 +186,8 @@ module TechRadar {
                                 }
                             } = {};
                             var filteredTechnologies: Technology[] = [];
+                            
+                            return;
 
                             technologies.forEach((t) => {
                                 var include = true;

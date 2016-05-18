@@ -31,110 +31,11 @@
 		private static cache: { [topic: string]: Array<IMessageBusCallback> } = {};
 
         constructor() {
-            PNotify.prototype.options.styling = "fontawesome";
+        
         }
 
-		/**
-		 * Publish a notification
-         * @title:       the title of the notification
-         * @text:        the contents of the notification
-         * @location:    the location on the screen where the notification is shown (default bottom right)
-		 */
-        notify(title: string, text: string, location = NotifyLocation.BottomRight) {
-            var cssLocation: string,
-                dir1       : string,
-                dir2       : string;
-
-            switch (location) {
-                case NotifyLocation.BottomLeft:
-                    cssLocation = 'stack-bottomleft';
-                    dir1 = 'up';
-                    dir2 = 'right';
-                    break;
-                case NotifyLocation.TopRight:
-                    cssLocation = 'stack-topright';
-                    dir1 = 'down';
-                    dir2 = 'left';
-                    break;
-                case NotifyLocation.TopLeft:
-                    cssLocation = 'stack-topleft';
-                    dir1 = 'down';
-                    dir2 = 'right';
-                    break;
-                default:
-                    cssLocation = 'stack-bottomright';
-                    dir1 = 'up';
-                    dir2 = 'left';
-                    break;
-            }
-
-            var options : pnotifyDefaults = {
-                title      : title,
-                text       : text,
-                icon       : 'fa fa-info',
-                cornerclass: 'ui-pnotify-sharp',
-                addclass   : cssLocation,
-				stack      : { "dir1": dir1, "dir2": dir2, "spacing1": 25, "spacing2": 25 }
-            };
-
-            var pn = new PNotify(options);
-        }
-
-		/**
-		 * Show a confirm dialog
-         * @title           : the title of the notification
-         * @text            : the contents of the notification
-         * @callback        : the callback that will be called after the confirmation has been answered.
-		 */
-        public confirm(title: string, text: string, callback: (result: boolean) => any) {
-            var options = {
-                title       : title,
-                text        : text,
-                hide        : false,
-                confirm     : {
-                    confirm : true
-                },
-                buttons     : {
-                    closer  : false,
-                    sticker : false
-                },
-                history     : {
-                    history : false
-                },
-                icon        : 'fa fa-question-circle',
-                cornerclass : 'ui-pnotify-sharp',
-                addclass    : "stack-topright",
-                stack       : { "dir1": "down", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
-            };
-
-            var pn = new PNotify(options).get()
-                .on('pnotify.confirm', () => { callback(true); })
-                .on('pnotify.cancel', () => { callback(false); });
-        }
-
-        public notifyBottom(title: string, text: string) {
-            var stack_bar_bottom = { "dir1": "up", "dir2": "right", "spacing1": 0, "spacing2": 0 };
-            var options = {
-                title: "Over Here",
-                text: "Check me out. I'm in a different stack.",
-                addclass: "stack-bar-bottom",
-                cornerclass: "",
-                width: "70%",
-                stack: stack_bar_bottom
-            };
-            var pn = new PNotify(options);
-
-        }
-
-		/**
-		 * Publish a notification
-         * @title: the title of the notification
-         * @text:  the contents of the notification
-		 */
-        public notifyData(data: any) {
-            var pn = new PNotify(data);
-            //this.publish("notify", "", data);
-        }
+		
+		
 
 		/**
 		 * Publish to a topic

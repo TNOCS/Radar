@@ -3,7 +3,8 @@ module App {
     import Technology      = TechRadar.Technology;
 
     export interface IHomeScope extends ng.IScope {
-        vm: HomeCtrl;        
+        vm: HomeCtrl; 
+        leftPanelVisible : boolean;       
     }
 
     export class HomeCtrl {
@@ -29,9 +30,11 @@ module App {
             private $scope             : IHomeScope,
             private $timeout           : ng.ITimeoutService,
             private busService         : csComp.Services.MessageBusService,
-            private spreadsheetService : csComp.Services.SpreadsheetService
+            public data : csComp.Services.SpreadsheetService
             ) {
             $scope.vm = this;
+            $scope.leftPanelVisible = true;
+            
             
             this.options = { prio : { 1 : true, 2: true, 3:false} };
             busService.subscribe('technology', (action: string, t: Technology) => {
@@ -50,14 +53,17 @@ module App {
             this.reload();
         }
         
+        public addFilter()
+        {
+            this.data.activeConfig.Filters.push({Visual : "Horizontal", Dimension : "Category", Enabled:true });
+            
+        }
+        
         /** reload new technologies */
         private reload() {
-            this.technologies = this.spreadsheetService.technologies;
-            if (!this.technologies || this.technologies.length === 0) return;
-            this.$timeout(() => {
-                this.initSlider();
-                this.setFocus(this.technologies[0]);
-            }, 0);
+             if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {                
+                this.$scope.$apply();
+             }            
         }
 
         public setFocus(t: Technology) {

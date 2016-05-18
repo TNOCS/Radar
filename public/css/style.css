@@ -19,7 +19,7 @@ html, body, #map {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    background: beige;
+    background: white;
 }
 html, body, #container {
     height: 100%;
@@ -28,12 +28,191 @@ html, body, #container {
     width: 100%;
 }
 body {
-    padding-top: 50px;
+    
 }
-.technology-list-container{
-  background:grey;
-  height:100px;
+
+ .search-icon {
+            width: 40px;
+            float: left;
+            cursor: pointer;
+            border-right-style: solid;
+            border-right-width: 1px;
+            border-right-color: lightgray;
+        }
+
+.header-box {
+            position: absolute;
+            left: 25px;
+            top: 15px;
+                min-width: 400px;
+            height: 50px;
+                background: white;
+            box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+        }
+.menutoggle {
+    -moz-transition: all 0.2s ease-out 0s;
+    -webkit-transition: all 0.2s ease-out 0s;
+    color: white;
+    cursor: pointer;
+    float: left;
+    font-size: 22px;
+    height: 50px;
+    padding-left: 22px;
+    padding-top: 10px;
+    transition: all 0.2s ease-out 0s;
+    width: 70px;
 }
+
+.sidebar {
+    pointer-events: none;
+    position: absolute;
+    display: flex;
+        background: white;
+    top: 75px;
+    width: 300px;    
+    left: 25px;    
+        box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+        bottom:20px;
+}
+
+.leftpanel {
+    background: white;
+    
+    display: inline-block;
+    pointer-events: all;
+    
+    
+}
+
+.technology-list-container
+{
+    position:absolute;
+    top:65px;
+    bottom:0;
+    left:0;
+    right:0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.technology-list-title
+{
+        font-size: 18px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-bottom: 4px;
+}
+
+ .lp-tab {
+            width: 60px;
+            height: 60px;
+            float: left;
+            padding: 15px;
+            /* padding-left: 20px; */
+            cursor: pointer;
+            border-right-style: solid;
+            border-right-width: 1px;
+            border-right-color: lightgray;
+            font-size: 30px;
+            color: black;
+        }
+
+        .lp-tab.active {
+            background: lightskyblue
+        }
+
+.leftpanel-content > .tab-content {
+
+}
+.leftpanel-collapsed .leftpanel-content {
+    display: none;
+    width: 0;
+}
+.leftpanel-collapsed .leftpanel {
+    display: none;
+}
+.leftpanel-collapsed .leaflet-container {
+    margin-left: 0;
+}
+
+
+.leftpanel-entrance {
+    -webkit-animation: fadeInLeft 0.1s;
+}
+.leftpanel-entrance.ng-hide {
+    opacity: 0;
+}
+.leftpanel-exit {
+    -webkit-animation: fadeOutLeft 0.0s;
+}
+.leftpanel-header-button {
+    float: right;
+    border: 0;
+    background: transparent;
+}
+.leftpanel-header-button-container {
+    float: right;
+    margin-right: 10px;
+}
+.leftpanel-header-button-container-left {
+    float: left;
+    margin-left: -5px;
+    margin-right: 5px;
+}
+
+.leftpanel-header {
+    font-size: 35px;
+    font-weight: bold;
+    margin-top: 7px;
+    padding-bottom: 10px;
+    width: 100%;
+}
+.leftpanel-collapsed .navbar {
+    left: 0;
+}
+.leftpanel-content {
+         position: absolute;
+    z-index: 0;
+    left: 0;
+    right: 0;
+    top: 60px;
+    margin: 0;
+    bottom: 0;
+
+}
+
+.nav > li {
+    cursor: pointer;
+}
+.nav-pills > li > a {
+    border-radius: 0;
+}
+
+.leftpanel-tab {
+      width: 100%;
+    position: absolute;
+    z-index: 1;
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    border-bottom-color: lightgray;
+}
+
+/* Header bar should be overwritten by children, so if you increase the border-top height above, you should match it here */
+.leftpanel-content > .tab-content {
+
+}
+.leftpanel-collapsed .leftpanel-content {
+    display: none;
+    width: 0;
+}
+.leftpanel-collapsed .leftpanel {
+    display: none;
+}
+.leftpanel-collapsed .leaflet-container {
+    margin-left: 0;
+}
+
+
 .ts {
     margin: 0;
     padding: 0;
