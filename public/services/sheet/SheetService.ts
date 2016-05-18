@@ -1,11 +1,12 @@
+//var _ = import('lodash');
+
 module csComp.Services {
     declare var Tabletop;
 
     export class Filter {
-                
-        constructor (public Visual: "Horizontal" | "Vertical" | "Color", public Dimension: string,public Enabled: boolean )
-        {
-            
+
+        constructor(public Visual: "Horizontal" | "Vertical" | "Color", public Dimension: string, public Enabled: boolean) {
+
         }
     }
 
@@ -36,10 +37,9 @@ module csComp.Services {
         constructor(title: string, obj: any) {
             this.Title = title;
             this.Value = obj[title];
-
-            //this.Title = 
-
         }
+        
+        
 
     }
 
@@ -50,6 +50,7 @@ module csComp.Services {
         Scores: InputScore[];
         Examples: string;
         Remarks: string;
+        _Technology: ITechnology;
 
         constructor(input: any) {
             this.Technology = input.Technology;
@@ -79,6 +80,8 @@ module csComp.Services {
         Description: string;
         Category: string;
         SubCategory: string;
+        _Category: ICategory;
+        _SubCategory: ISubCategory;
     }
 
     export interface ICategory {
@@ -90,7 +93,7 @@ module csComp.Services {
     export interface ISubCategory {
         SubCategory: string;
         Category: string;
-        _Category : ICategory;
+        _Category: ICategory;
         Description: string;
     }
 
@@ -119,11 +122,11 @@ module csComp.Services {
         public presets: Config[];
 
         public initConfig(config: Config) {
-            
+
             config.Filters = [];
-            config.Filters.push(new Filter("Horizontal","",false));
-            config.Filters.push(new Filter("Vertical","",false));
-            config.Filters.push(new Filter("Color","",false));
+            config.Filters.push(new Filter("Horizontal", "", false));
+            config.Filters.push(new Filter("Vertical", "", false));
+            config.Filters.push(new Filter("Color", "", false));
         }
 
         /** Load the technologies */
@@ -141,9 +144,30 @@ module csComp.Services {
                 this.sheets.Categories = r.Categories.elements;
                 this.sheets.SubCategories = r.SubCategories.elements;
                 this.sheets.RadarInput = [];
-                r["Radar Input"].elements.forEach(i => {
-                    this.sheets.RadarInput.push(new RadarInput(i));
+
+                this.sheets.Technologies.forEach(t => {
+                    t._Category = _.find(this.sheets.Categories, (c) => c.Category === t.Category);
+                    t._SubCategory = _.find(this.sheets.SubCategories, (c) => c.SubCategory === t.SubCategory);
                 });
+
+                r["Radar Input"].elements.forEach(i => {
+                    var ri = new RadarInput(i);
+                    ri._Technology = _.find(this.sheets.Technologies, (t) => t.Technology === ri.Technology);
+                    ri.Scores.push(new InputScore("Users",{ "Users" : ri.Users}));                    
+                    if (ri._Technology) {
+                        ri.Scores.push(new InputScore("Category",{ "Category" : ri._Technology.Category}));
+                        ri.Scores.push(new InputScore("SubCategory",{ "SubCategory" : ri._Technology.SubCategory}));
+                        
+                        if (ri._Technology._Category)
+                        {
+                            ri.Scores.push(new InputScore("Domain",{ "Domain" : ri._Technology._Category.Domain}));
+                        }
+                        
+                    }                    
+                    this.sheets.RadarInput.push(ri);
+                });
+
+
 
 
                 // this.technologies = [];

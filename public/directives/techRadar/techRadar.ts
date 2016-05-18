@@ -44,6 +44,7 @@ module TechRadar {
     export interface ITechRadarChartScope extends ng.IScope {
         technologies: Technology[];
         options: RenderOptions;
+        config : csComp.Services.SpreadsheetService;
         searchterm: string;
         prioritylevel: number;
         /**
@@ -148,6 +149,10 @@ module TechRadar {
                                 case "3": return "yellow"; 
                                 default: return "gray"; 
                             }
+                        })
+                        
+                        bus.subscribe("technologies",(e,d)=>{
+                            if (e === "loaded") scope.render(scope.config);
                         })
 
                         scope.render = (config : csComp.Services.SpreadsheetService, renderOptions?: RenderOptions) => {
@@ -465,13 +470,14 @@ module TechRadar {
                                     .on("click", (t: Technology, i: number) => {
                                         scope.options.time = null;
                                         scope.options.category = null;
-                                        scope.render(technologies, scope.options);
+                                        scope.render(scope.config, scope.options);
                                     });
                             }
                         };
-
-                        scope.$watch('technologies', function(newVal, oldVal) {
-                            if (newVal !== oldVal) scope.render(scope.technologies, scope.options);
+                        
+                        scope.$watch('config', function(newVal, oldVal) {
+                            //if (newVal !== oldVal) 
+                            scope.render(scope.config, scope.options);
                         });
 
                         scope.$watch('searchterm', function(newVal, oldVal) {
@@ -503,7 +509,7 @@ module TechRadar {
                             actualHeight = 2 * outerRadius + margin.top + margin.bottom;
                             scope.render(scope.technologies, scope.options);
                         });
-                    }
+                    }                    
                 }
             }])
 }

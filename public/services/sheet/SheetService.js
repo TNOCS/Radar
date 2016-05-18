@@ -69,8 +69,22 @@ var csComp;
                     _this.sheets.Categories = r.Categories.elements;
                     _this.sheets.SubCategories = r.SubCategories.elements;
                     _this.sheets.RadarInput = [];
+                    _this.sheets.Technologies.forEach(function (t) {
+                        t._Category = _.find(_this.sheets.Categories, function (c) { return c.Category === t.Category; });
+                        t._SubCategory = _.find(_this.sheets.SubCategories, function (c) { return c.SubCategory === t.SubCategory; });
+                    });
                     r["Radar Input"].elements.forEach(function (i) {
-                        _this.sheets.RadarInput.push(new RadarInput(i));
+                        var ri = new RadarInput(i);
+                        ri._Technology = _.find(_this.sheets.Technologies, function (t) { return t.Technology === ri.Technology; });
+                        ri.Scores.push(new InputScore("Users", { "Users": ri.Users }));
+                        if (ri._Technology) {
+                            ri.Scores.push(new InputScore("Category", { "Category": ri._Technology.Category }));
+                            ri.Scores.push(new InputScore("SubCategory", { "SubCategory": ri._Technology.SubCategory }));
+                            if (ri._Technology._Category) {
+                                ri.Scores.push(new InputScore("Domain", { "Domain": ri._Technology._Category.Domain }));
+                            }
+                        }
+                        _this.sheets.RadarInput.push(ri);
                     });
                     callback();
                 });
