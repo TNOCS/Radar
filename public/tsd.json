@@ -16,6 +16,9 @@
     },
     "jquery.pnotify/jquery.pnotify.d.ts": {
       "commit": "544a35a10866b32afda9c7f029c0764558563f4f"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "e0abafb1a6ff652f7ff967120e312d5c1916eaef"
     }
   }
 }
