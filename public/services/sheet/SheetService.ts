@@ -5,7 +5,7 @@ module csComp.Services {
 
     export class Filter {
 
-        constructor(public Visual: "Horizontal" | "Vertical" | "Color", public Dimension: string, public Enabled: boolean) {
+        constructor(public Visual: 'Horizontal' | 'Radial' | 'Color', public Dimension: string, public Enabled: boolean) {
 
         }
     }
@@ -24,6 +24,7 @@ module csComp.Services {
         Categories: ICategory[];
         SubCategories: ISubCategory[];
         RadarInput: RadarInput[];
+        Examples: Example[] = [];
     }
 
     export class InputScore {
@@ -31,15 +32,14 @@ module csComp.Services {
         Title: string;
         Year: number;
         Score: string;
-        Value: number;
+        Value: string;
 
 
         constructor(title: string, obj: any) {
-            this.Title = title;
+            var t = title.replace(' 2016', '');
+            this.Title = t;
             this.Value = obj[title];
         }
-        
-        
 
     }
 
@@ -51,6 +51,7 @@ module csComp.Services {
         Examples: string;
         Remarks: string;
         _Technology: ITechnology;
+        _Examples: Example[];
 
         constructor(input: any) {
             this.Technology = input.Technology;
@@ -58,7 +59,7 @@ module csComp.Services {
             this.Description = input.Description;
             this.Scores = [];
             this.Remarks = input.Remarks;
-            this.Examples = input["Examples & Products"];
+            this.Examples = input["Examples & Products"].trim();
             this.Scores.push(new InputScore("TRL 2016", input));
             this.Scores.push(new InputScore("Adoption 2016", input));
             this.Scores.push(new InputScore("Hype Cycle 2016", input));
@@ -80,9 +81,11 @@ module csComp.Services {
         Description: string;
         Category: string;
         SubCategory: string;
+        Examples: Example[];
+
         _Category: ICategory;
         _SubCategory: ISubCategory;
-        _RadarInput : RadarInput[];
+        _RadarInput: RadarInput[];
     }
 
     export interface ICategory {
@@ -112,6 +115,23 @@ module csComp.Services {
         Content: string;
     }
 
+    export class Example {
+        Name: string;
+        Url: string;
+        Icon: string;
+
+        constructor(i: string) {
+            var result = /(.*)\[(.*)\]/.exec(i);
+            if (result && result.length > 2) {
+                this.Name = result[1];
+                this.Url = result[2];
+            } else {
+                this.Name = i;
+            }
+
+        }
+    }
+
     /**
      * An service wrapper around the Tabletop javascript library.
      * See: https://github.com/jsoma/tabletop
@@ -121,12 +141,15 @@ module csComp.Services {
         public sheets: Sheets;
         public activeConfig: Config;
         public presets: Config[];
+        public horizontal : string[];
+        public radial : string[];
+        public items : RadarInput[];
 
         public initConfig(config: Config) {
 
             config.Filters = [];
-            config.Filters.push(new Filter("Horizontal", "", false));
-            config.Filters.push(new Filter("Vertical", "", false));
+            config.Filters.push(new Filter("Horizontal", "TRL", false));
+            config.Filters.push(new Filter("Radial", "Category", false));
             config.Filters.push(new Filter("Color", "", false));
         }
 
@@ -140,7 +163,7 @@ module csComp.Services {
             this.initConfig(this.activeConfig);
 
             this.loadSheet(url, (r) => {
-                this.sheets = new Sheets(); 
+                this.sheets = new Sheets();
                 this.sheets.Technologies = r.Technologies.elements;
                 this.sheets.Categories = r.Categories.elements;
                 this.sheets.SubCategories = r.SubCategories.elements;
@@ -152,22 +175,47 @@ module csComp.Services {
                     t._RadarInput = [];
                 });
 
-                r["Radar Input"].elements.forEach(i => {
+                var lastTech = '';
+
+                r['Radar Input'].elements.forEach(i => {
                     var ri = new RadarInput(i);
-                    ri._Technology = _.find(this.sheets.Technologies, (t) => t.Technology === ri.Technology);
-                    ri.Scores.push(new InputScore("Users",{ "Users" : ri.Users}));                    
-                    if (ri._Technology) {
-                        ri.Scores.push(new InputScore("Category",{ "Category" : ri._Technology.Category}));
-                        ri.Scores.push(new InputScore("SubCategory",{ "SubCategory" : ri._Technology.SubCategory}));
-                        
-                        if (ri._Technology._Category)
-                        {
-                            ri.Scores.push(new InputScore("Domain",{ "Domain" : ri._Technology._Category.Domain}));
+                    if (ri.Technology === '') ri.Technology = lastTech;
+                    lastTech = ri.Technology;
+                    ri._Examples = [];
+                    var examples = ri.Examples.split(',');
+                    examples.forEach(e => {
+                        // create example
+                        var example = new Example(e);
+
+                        // look for existing example based on url
+
+                        var existingExample = _.find(this.sheets.Examples, (ex) => ((ex.Url && example.Url && ex.Url.toLowerCase() === example.Url.toLowerCase()) || (!ex.Url && ex.Name && example.Name && ex.Name.toLowerCase() === example.Name.toLowerCase())));
+                        if (existingExample) {
+                            ri._Examples.push(existingExample);
+                        } else {
+                            this.sheets.Examples.push(example);
+                            ri._Examples.push(example);
                         }
-                        
-                    }                    
-                    this.sheets.RadarInput.push(ri);
-                    ri._Technology._RadarInput.push(ri);
+
+
+                    });
+                    ri._Technology = _.find(this.sheets.Technologies, (t) => t.Technology === ri.Technology);
+                    if (ri._Technology && ri.Description) {
+                        ri.Scores.push(new InputScore("Users", { "Users": ri.Users }));
+                        if (ri._Technology) {
+                            ri.Scores.push(new InputScore("Category", { "Category": ri._Technology.Category }));
+                            ri.Scores.push(new InputScore("SubCategory", { "SubCategory": ri._Technology.SubCategory }));
+                            if (ri._Technology._Category) {
+                                ri.Scores.push(new InputScore("Domain", { "Domain": ri._Technology._Category.Domain }));
+                            }
+                        }
+                        this.sheets.RadarInput.push(ri);
+                    }
+                    else
+                    {
+                        console.log('Warning not found' + ri.Technology);
+                    }
+                    //if (ri._Technology) ri._Technology._RadarInput.push(ri);
                 });
 
 

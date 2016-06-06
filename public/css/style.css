@@ -306,6 +306,16 @@ body {
   margin-left: 2px;
   margin-top: 5px; }
 
+  .example-list-container{
+ position:absolute;
+    top:65px;
+    bottom:0;
+    left:0;
+    right:0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
 .technology-list-container
 {
     position:absolute;
@@ -705,6 +715,11 @@ textarea {
 }
 .tree li ul > li {
     display: none;
+}
+
+#techRadar
+{
+    margin-left:100px; 
 }
 
   
