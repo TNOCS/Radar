@@ -706,3 +706,11 @@ textarea {
 .tree li ul > li {
     display: none;
 }
+
+  
+         .arc {
+            fill: red;
+            stroke: white;
+            stroke-width: 3;
+        }
+     
