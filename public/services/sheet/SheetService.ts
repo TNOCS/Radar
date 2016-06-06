@@ -82,6 +82,7 @@ module csComp.Services {
         SubCategory: string;
         _Category: ICategory;
         _SubCategory: ISubCategory;
+        _RadarInput : RadarInput[];
     }
 
     export interface ICategory {
@@ -139,7 +140,7 @@ module csComp.Services {
             this.initConfig(this.activeConfig);
 
             this.loadSheet(url, (r) => {
-                this.sheets = new Sheets();
+                this.sheets = new Sheets(); 
                 this.sheets.Technologies = r.Technologies.elements;
                 this.sheets.Categories = r.Categories.elements;
                 this.sheets.SubCategories = r.SubCategories.elements;
@@ -148,6 +149,7 @@ module csComp.Services {
                 this.sheets.Technologies.forEach(t => {
                     t._Category = _.find(this.sheets.Categories, (c) => c.Category === t.Category);
                     t._SubCategory = _.find(this.sheets.SubCategories, (c) => c.SubCategory === t.SubCategory);
+                    t._RadarInput = [];
                 });
 
                 r["Radar Input"].elements.forEach(i => {
@@ -165,6 +167,7 @@ module csComp.Services {
                         
                     }                    
                     this.sheets.RadarInput.push(ri);
+                    ri._Technology._RadarInput.push(ri);
                 });
 
 

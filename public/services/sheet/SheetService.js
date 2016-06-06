@@ -72,6 +72,7 @@ var csComp;
                     _this.sheets.Technologies.forEach(function (t) {
                         t._Category = _.find(_this.sheets.Categories, function (c) { return c.Category === t.Category; });
                         t._SubCategory = _.find(_this.sheets.SubCategories, function (c) { return c.SubCategory === t.SubCategory; });
+                        t._RadarInput = [];
                     });
                     r["Radar Input"].elements.forEach(function (i) {
                         var ri = new RadarInput(i);
@@ -85,6 +86,7 @@ var csComp;
                             }
                         }
                         _this.sheets.RadarInput.push(ri);
+                        ri._Technology._RadarInput.push(ri);
                     });
                     callback();
                 });
