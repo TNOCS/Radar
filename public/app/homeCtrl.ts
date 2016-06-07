@@ -36,7 +36,10 @@ module App {
             $scope.vm = this;
             $scope.leftPanelVisible = true;
 
-
+            busService.subscribe('technologies', (title: string) => {
+                if (title !== 'loaded') return;
+                this.reload();
+            });
 
             this.options = { prio: { 1: true, 2: true, 3: false } };
             busService.subscribe('technology', (action: string, t: csComp.Services.ITechnology) => {
@@ -45,11 +48,6 @@ module App {
                         this.selectTechnology(t);
                         break;
                 }
-            });
-
-            busService.subscribe('technologies', (title: string) => {
-                if (title !== 'loaded') return;
-                this.reload();
             });
 
             busService.subscribe('radarinput', (action: string, ri: csComp.Services.RadarInput) => {
@@ -102,11 +100,21 @@ module App {
             return res;
         }
 
+        public DisableFilter(f : csComp.Services.Filter)
+        {
+            f.Enabled = false;
+            this.updateFilter();
+        }
+
         public updateFilter() {
             this.data.items = [];
             if (!this.data.sheets || !this.data.sheets.RadarInput) return;
             this.data.sheets.RadarInput.forEach(ri => {
-                if (ri.getDimensionValue("Users") === "Makers") this.data.items.push(ri);
+                var match = true;
+                this.data.activeConfig.Filters.forEach(f => {
+                    if (f.Enabled && f.Value && ri.getDimensionValue(f.Dimension) !== f.Value) match = false;
+                });
+                if (match) this.data.items.push(ri);
             });
             this.data.activeConfig.Visualisation.forEach(f => {
                 switch (f.Visual) {

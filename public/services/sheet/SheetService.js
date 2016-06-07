@@ -2,10 +2,19 @@ var csComp;
 (function (csComp) {
     var Services;
     (function (Services) {
-        var Filter = (function () {
-            function Filter(Visual, Dimension, Enabled) {
+        var Vis = (function () {
+            function Vis(Visual, Dimension, Enabled) {
                 this.Visual = Visual;
                 this.Dimension = Dimension;
+                this.Enabled = Enabled;
+            }
+            return Vis;
+        }());
+        Services.Vis = Vis;
+        var Filter = (function () {
+            function Filter(Dimension, Value, Enabled) {
+                this.Dimension = Dimension;
+                this.Value = Value;
                 this.Enabled = Enabled;
             }
             return Filter;
@@ -78,22 +87,19 @@ var csComp;
             }
             SpreadsheetService.prototype.initConfig = function (config) {
                 config.Visualisation = [];
-                config.Visualisation.push(new Filter("Horizontal", "Adoption", false));
-                config.Visualisation.push(new Filter("Radial", "Category", false));
-                config.Visualisation.push(new Filter("Color", "TRL", false));
-                config.Visualisation.push(new Filter("Size", "TRL", false));
+                config.Visualisation.push(new Vis("Horizontal", "Adoption", false));
+                config.Visualisation.push(new Vis("Radial", "Category", false));
+                config.Visualisation.push(new Vis("Color", "TRL", false));
+                config.Visualisation.push(new Vis("Size", "TRL", false));
             };
             SpreadsheetService.prototype.loadTechnologies = function (url, callback) {
-                var _this = this;
                 this.activeConfig = new Config();
                 this.presets = [];
                 this.presets.push(this.activeConfig);
                 this.initConfig(this.activeConfig);
-                this.loadSheet(url, function (r) {
-                    var serialized = CircularJSON.stringify(r);
-                    localStorage.setItem('backup', serialized);
-                    _this.parseTechnologies(r, callback);
-                });
+                var serialized = localStorage.getItem('backup');
+                var r = CircularJSON.parse(serialized);
+                this.parseTechnologies(r, callback);
             };
             SpreadsheetService.prototype.parseTechnologies = function (r, callback) {
                 var _this = this;
@@ -140,6 +146,19 @@ var csComp;
                     }
                     else {
                         console.log('Warning not found' + ri.Technology);
+                    }
+                });
+                this.activeConfig.Filters = [];
+                this.sheets.Dimensions.forEach(function (d) {
+                    if (d !== "-none-") {
+                        var f = new Filter(d, '', true);
+                        f.Options = [];
+                        _this.sheets.RadarInput.forEach(function (ri) {
+                            var v = ri.getDimensionValue(d);
+                            if (v && f.Options.indexOf(v) === -1)
+                                f.Options.push(v);
+                        });
+                        _this.activeConfig.Filters.push(f);
                     }
                 });
                 callback();

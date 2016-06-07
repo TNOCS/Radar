@@ -4,21 +4,30 @@ module csComp.Services {
     declare var Tabletop;
     declare var CircularJSON;
 
-    export class Filter {
+    export class Vis {
 
         constructor(public Visual: 'Horizontal' | 'Radial' | 'Color' | 'Size', public Dimension: string, public Enabled: boolean) {
 
         }
     }
 
+    export class Filter {
+
+        public Options: string[];
+
+        constructor(public Dimension: string, public Value: string, public Enabled: boolean) {
+
+        }
+    }
+
     export class Config {
         public Title: string;
-        public Visualisation: Filter[];
-        public Filters: Filter[];        
+        public Visualisation: Vis[];
+        public Filters: Filter[];
         public horizontalDimension: string;
         public radialDimension: string;
         public colorDimension: string;
-        public sizeDimension : string;
+        public sizeDimension: string;
     }
 
 
@@ -64,7 +73,7 @@ module csComp.Services {
         _segmentPos: number;
         _segmentItemPos: number;
 
-        constructor(input: any, sheet : Sheets) {
+        constructor(input: any, sheet: Sheets) {
             this.Technology = input.Technology;
             this.Users = input.Users;
             this.Description = input.Description;
@@ -159,15 +168,16 @@ module csComp.Services {
         public horizontal: string[];
         public radial: string[];
         public colors: string[];
-        public size : string[];
+        public size: string[];
         public items: RadarInput[];
 
         public initConfig(config: Config) {
+
             config.Visualisation = [];
-            config.Visualisation.push(new Filter("Horizontal", "Adoption", false));
-            config.Visualisation.push(new Filter("Radial", "Category", false));
-            config.Visualisation.push(new Filter("Color", "TRL", false));
-            config.Visualisation.push(new Filter("Size", "TRL", false));
+            config.Visualisation.push(new Vis("Horizontal", "Adoption", false));
+            config.Visualisation.push(new Vis("Radial", "Category", false));
+            config.Visualisation.push(new Vis("Color", "TRL", false));
+            config.Visualisation.push(new Vis("Size", "TRL", false));
         }
 
         /** Load the technologies */
@@ -180,15 +190,16 @@ module csComp.Services {
 
             this.initConfig(this.activeConfig);
 
-            // var serialized = localStorage.getItem('backup');
-            // var r = CircularJSON.parse(serialized);
-            // this.parseTechnologies(r,callback);
+            var serialized = localStorage.getItem('backup');
+            var r = CircularJSON.parse(serialized);
+            this.parseTechnologies(r, callback);
 
-            this.loadSheet(url, (r) => {
-                var serialized = CircularJSON.stringify(r);
-                localStorage.setItem('backup', serialized);
-                this.parseTechnologies(r, callback);
-            });
+
+            // this.loadSheet(url, (r) => {
+            //     var serialized = CircularJSON.stringify(r);
+            //     localStorage.setItem('backup', serialized);
+            //     this.parseTechnologies(r, callback);
+            // });
         }
 
         private parseTechnologies(r, callback) {
@@ -246,63 +257,23 @@ module csComp.Services {
                 //if (ri._Technology) ri._Technology._RadarInput.push(ri);
             });
 
+            // init filters
+            this.activeConfig.Filters = [];
+            this.sheets.Dimensions.forEach(d => {
+                if (d !== "-none-") {
+                    var f = new Filter(d, '', true);
+                    f.Options = [];
+                    this.sheets.RadarInput.forEach(ri => {
+                        var v = ri.getDimensionValue(d);
+                        if (v && f.Options.indexOf(v) === -1) f.Options.push(v);
+                    });
+
+                    this.activeConfig.Filters.push(f);
+                }
+            });
 
 
 
-            // this.technologies = [];
-            // var id = 1;
-            // var page = 0;
-            // var technology;
-            // spreadsheet.forEach((row) => {
-            //     // check if it's part of previous
-            //     if (row.Category !== '') {
-
-            //         //console.log(row.Category); 
-            //         //console.log(row.Title);
-            //         var deltaTimeString = row.DeltaTime;
-            //         var priority = parseInt(row.Relevance.toString(), 10);
-            //         var color;
-            //         switch (priority) {
-            //             case 1: color = '#F39092'; break;
-            //             case 2: color = '#F5DC8F'; break;
-            //             case 3: color = '#9EBACB'; break;
-            //             case 4: color = '#DFE0DC'; break;
-            //             default: color = 'white'; break;
-            //         }
-            //         var deltaTime = 0;
-            //         if (typeof deltaTimeString === 'string') {
-            //             deltaTime = +deltaTimeString.replace(',', '.');
-            //         } else {
-            //             deltaTime = deltaTimeString;
-            //         }
-            //         page = 0;
-            //         technology = new TechRadar.Technology(
-            //             id++,
-            //             priority,
-            //             row.Category,
-            //             row.Thumbnail,
-            //             row.TimeCategory,
-            //             deltaTime,
-            //             row.ShortTitle,
-            //             row.Title,
-            //             row.Subtitle,
-            //             row.Text,
-            //             color);
-            //         this.technologies.push(technology);
-            //     }
-
-            //     if (row.ContentType === '') row.ContentType = 'markdown';
-            //     if (row.Content !== '') {
-            //         var c = new TechRadar.Content(page++, row.ContentType, row.Content, row.Subtitle);
-            //         if (c.contentType.toLowerCase() === 'youtube') {
-            //             c.videoUrl = c.content.indexOf('http') > 0
-            //                 ? c.content
-            //                 : 'http://www.youtube.com/embed/' + c.content + '?rel=0&autoplay=1';
-            //             //console.log(c.videoUrl);
-            //         };
-            //         technology.content.push(c);
-            //     }
-            // });
             callback();
         }
 

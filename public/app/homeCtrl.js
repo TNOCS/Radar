@@ -10,6 +10,11 @@ var App;
             this.isSliderInitialised = false;
             $scope.vm = this;
             $scope.leftPanelVisible = true;
+            busService.subscribe('technologies', function (title) {
+                if (title !== 'loaded')
+                    return;
+                _this.reload();
+            });
             this.options = { prio: { 1: true, 2: true, 3: false } };
             busService.subscribe('technology', function (action, t) {
                 switch (action) {
@@ -17,11 +22,6 @@ var App;
                         _this.selectTechnology(t);
                         break;
                 }
-            });
-            busService.subscribe('technologies', function (title) {
-                if (title !== 'loaded')
-                    return;
-                _this.reload();
             });
             busService.subscribe('radarinput', function (action, ri) {
                 switch (action) {
@@ -59,13 +59,22 @@ var App;
             });
             return res;
         };
+        HomeCtrl.prototype.DisableFilter = function (f) {
+            f.Enabled = false;
+            this.updateFilter();
+        };
         HomeCtrl.prototype.updateFilter = function () {
             var _this = this;
             this.data.items = [];
             if (!this.data.sheets || !this.data.sheets.RadarInput)
                 return;
             this.data.sheets.RadarInput.forEach(function (ri) {
-                if (ri.getDimensionValue("Users") === "Makers")
+                var match = true;
+                _this.data.activeConfig.Filters.forEach(function (f) {
+                    if (f.Enabled && f.Value && ri.getDimensionValue(f.Dimension) !== f.Value)
+                        match = false;
+                });
+                if (match)
                     _this.data.items.push(ri);
             });
             this.data.activeConfig.Visualisation.forEach(function (f) {
