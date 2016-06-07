@@ -17,7 +17,7 @@
     <div class="container-fluid" style="padding: 0 0 0 0">
         <div>
             <tech-radar-chart id="techRadar" config="vm.data" searchterm="searchText" prioritylevel="tech.priority" options="vm.options" startangle="-90"
-                endangle="270" style="position:absolute;left:0;right:0;top:0;bottom:0"></tech-radar-chart>
+                endangle="270" style="position:absolute;left:300px;right:0;top:100px;bottom:0"></tech-radar-chart>
         </div>
         <!--<div class="col-md-6" style="background:#bdbdbd;margin:0;width:55%;height:100%;padding:0">
             <infoSlide></infoSlide>
@@ -31,7 +31,7 @@
 
                 <div class="leftpanel-tab">
                     <ul class="nav nav-pills">
-                        <li class="lp-tab" data-target="#config" data-toggle="tab">
+                        <li class="lp-tab active" data-target="#config" data-toggle="tab">
                             <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                 viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
                                 <g>
@@ -40,7 +40,7 @@
                                 </g>
                             </svg>
                         </li>
-                        <li class="lp-tab active" data-target="#settings" data-toggle="tab">
+                        <li class="lp-tab" data-target="#settings" data-toggle="tab">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M63.6 28.4c-.1-.9-1.1-1.6-2-1.6-2.9 0-5.5-1.7-6.6-4.3-1.1-2.7-.4-5.8 1.8-7.8.7-.6.8-1.7.2-2.4-1.5-1.9-3.2-3.6-5-5.1-.7-.6-1.8-.5-2.4.2-1.9 2.1-5.3 2.9-7.9 1.8C39 8 37.2 5.3 37.4 2.3c.1-.9-.6-1.7-1.6-1.9-2.4-.3-4.8-.3-7.1 0-.9.1-1.6.9-1.6 1.8.1 2.9-1.6 5.7-4.3 6.8-2.6 1.1-6 .3-7.8-1.8-.6-.7-1.7-.8-2.4-.2-1.9 1.5-3.6 3.2-5.1 5.1-.6.7-.5 1.8.2 2.4 2.2 2 2.9 5.2 1.8 7.9-1.1 2.6-3.8 4.3-6.9 4.3-1 0-1.7.6-1.8 1.6-.3 2.4-.3 4.8 0 7.2 0 .8 1.1 1.5 2 1.5 2.8-.1 5.4 1.6 6.5 4.3 1.1 2.7.4 5.8-1.8 7.8-.7.6-.8 1.7-.2 2.4 1.5 1.9 3.2 3.6 5 5.1.7.6 1.8.5 2.4-.2 1.9-2.1 5.3-2.9 7.9-1.8 2.7 1.1 4.5 3.9 4.3 6.9-.1.9.6 1.7 1.6 1.9 1.2.1 2.4.2 3.6.2 1.2 0 2.3-.1 3.5-.2.9-.1 1.6-.9 1.6-1.8-.1-2.9 1.6-5.6 4.3-6.8 2.6-1.1 6-.3 7.8 1.8.6.7 1.7.8 2.4.2 1.9-1.5 3.6-3.2 5.1-5.1.6-.7.5-1.8-.2-2.4-2.2-2-2.9-5.2-1.8-7.9 1.1-2.6 3.7-4.3 6.5-4.3h.4c.9.1 1.7-.6 1.9-1.6.3-2.3.3-4.7 0-7.1zM32.2 42.6c-5.8 0-10.6-4.7-10.6-10.6 0-5.8 4.7-10.6 10.6-10.6 5.8 0 10.6 4.7 10.6 10.6 0 5.8-4.8 10.6-10.6 10.6zm0 0"
                                 />
@@ -59,15 +59,17 @@
                 <div class="leftpanel-content">
                     <!-- Tab panes -->
                     <div class="tab-content ">
-                        <div class="tab-pane" id="config">
+                        <div class="tab-pane active" id="config">
                             <h1>Filter</h1>
+                            <div>User : Makers</div>                            
+
+                            <h1>Visualisation</h1>
                             <div ng-repeat="f in vm.data.activeConfig.Filters">                                
-                                <div>Visual : {{f.Visual}}</div>
-                                <div>Dimension : {{f.Dimension}}</div>
+                                <div>{{f.Visual}} : {{f.Dimension}}</div>                                
                             </div>
-                            <button ng-click="vm.addFilter()">Add Filter</button>
+                            <!--<button ng-click="vm.addFilter()">Add Filter</button>-->
                         </div>
-                        <div class="tab-pane active" id="settings">
+                        <div class="tab-pane " id="settings">
                             <h1>Technologies</h1>
                             <div class="technology-list-container">
                                 <div ng-repeat="t in vm.data.sheets.Technologies">
@@ -123,18 +125,18 @@
             <div id="rightpanelTabPanes" class="tab-content rightpanelTabPanes" ng-show="rightPanelVisible">
                 <div class="tab-pane active" style="width:455px" id="featureprops-content">
                     <div class="rightpanel-content ng-isolate-scope" id="featureprops-content" style="padding:5px;max-width: 455px">
-                        <div class="infoTechnologyTitle">{{selected.Technology}}</div>
-                        <div class="infoTechnologyDescription">{{selected.Description}}</div>
+                        <div class="infoTechnologyTitle">{{selectedTechnology.Technology}}</div>
+                        <div class="infoTechnologyDescription">{{selectedTechnology.Description}}</div>
                         <div class="infoHeader">Category</div>
-                        <div class="infoCategoryCategory">{{selected._Category.Category}}</div>
-                        <div class="infoTechnologyDescription">{{selected._Category.Description}}</div>
+                        <div class="infoCategoryCategory">{{selectedTechnology._Category.Category}}</div>
+                        <div class="infoTechnologyDescription">{{selectedTechnology._Category.Description}}</div>
                                                 <div class="infoHeader">Sub Category</div>
-                        <div class="infoCategoryCategory">{{selected._SubCategory.SubCategory}}</div>
-                        <div class="infoTechnologyDescription">{{selected._SubCategory.Description}}</div>
+                        <div class="infoCategoryCategory">{{selectedTechnology._SubCategory.SubCategory}}</div>
+                        <div class="infoTechnologyDescription">{{selectedTechnology._SubCategory.Description}}</div>
                         <div class="infoHeader">Domain</div>
-                        <div class="infoCategoryCategory">{{selected._Category.Domain}}</div>
+                        <div class="infoCategoryCategory">{{selectedTechnology._Category.Domain}}</div>
 
-                        <div ng-repeat="ri in selected._RadarInput">
+                        <div ng-repeat="ri in selectedTechnology._RadarInput">
                             {{ri.Users}}
                             </div>
                         

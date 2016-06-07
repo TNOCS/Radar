@@ -5,7 +5,7 @@ module App {
         vm: HomeCtrl;
         leftPanelVisible: boolean;
         rightPanelVisible: boolean;
-        selected: csComp.Services.ITechnology;
+        selectedTechnology: csComp.Services.ITechnology;
     }
 
     export class HomeCtrl {
@@ -41,7 +41,7 @@ module App {
             busService.subscribe('technology', (action: string, t: csComp.Services.ITechnology) => {
                 switch (action) {
                     case 'selected':
-                        this.setFocus(t);
+                        this.selectTechnology(t);
                         break;
                 }
             });
@@ -51,12 +51,15 @@ module App {
                 this.reload();
             });
 
+             busService.subscribe('radarinput', (action: string, ri: csComp.Services.RadarInput) => {
+                switch (action) {
+                    case 'selected':
+                        this.selectRadarInput(ri);
+                        break;
+                }
+            });
+
             this.reload();
-        }
-
-        public addFilter() {
-            this.data.activeConfig.Filters.push({ Visual: "Horizontal", Dimension: "Category", Enabled: true });
-
         }
 
         /** reload new technologies */
@@ -71,7 +74,11 @@ module App {
             this.activeExample = e;
         }
 
-        public setFocus(t: csComp.Services.ITechnology) {
+        public selectRadarInput(ri : csComp.Services.RadarInput) {
+            console.log(ri);
+        }
+
+        public selectTechnology(t: csComp.Services.ITechnology) {
             // if (!this.isSliderInitialised) return;
             // this.technologies.forEach((ts) => ts.focus = false);
             // t.focus = true;
@@ -80,7 +87,7 @@ module App {
 
             // this.slider.gotoSlide(t.id);
             this.activeFocus = t.id;
-            this.$scope.selected = t;
+            this.$scope.selectedTechnology = t;
             this.$scope.rightPanelVisible = true;
 
         }
@@ -89,7 +96,7 @@ module App {
             var res: string[] = [];
             this.data.items.forEach(ri => {
                 var s = _.find(ri.Scores, { Title: dim });
-                if (s && res.indexOf(s.Value) === -1) res.push(s.Value);
+                if (s.Value!=='') if (s && res.indexOf(s.Value) === -1) res.push(s.Value);
             });
             return res;
         }
@@ -98,15 +105,17 @@ module App {
             this.data.items = [];
             if (!this.data.sheets || !this.data.sheets.RadarInput) return;
             this.data.sheets.RadarInput.forEach(ri => {
-                this.data.items.push(ri);
+                if (ri.getDimensionValue("Users") === "Makers") this.data.items.push(ri);
             });
             this.data.activeConfig.Filters.forEach(f => {
                 switch (f.Visual) {
                     case 'Horizontal':
                         this.data.horizontal = this.getDimensions(f.Dimension);
+                        this.data.activeConfig.horizontalDimension = f.Dimension;
                         break;
                     case 'Radial':
                         this.data.radial = this.getDimensions(f.Dimension);
+                        this.data.activeConfig.radialDimension = f.Dimension;
                         break;
                 }
             });
@@ -118,7 +127,7 @@ module App {
 
         private focus(t: csComp.Services.ITechnology) {
             this.busService.publish('technology', 'selected', t);
-            this.setFocus(t);
+            this.selectTechnology(t);
         }
 
         /**

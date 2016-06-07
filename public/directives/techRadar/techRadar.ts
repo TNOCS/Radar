@@ -94,19 +94,19 @@ module TechRadar {
 
                         var c = scope.config;
 
-
-
-                        var updateRadar = () => {
+                        var update = () => {
+                            var screenWidth = window.innerWidth;
 
                             if (!scope.config.radial || !scope.config.horizontal) return;
                             var radial = scope.config.radial; // ["2016", "2017", "2018", "2019", "2020", "2021", "2022"];
                             var horizontal = ["very low", "low", "neutral", "high", "very high"];
 
-                            var radius = 600; // radius of a circle
+
+                            var radius = 400; // radius of a circle
                             var thickness = 6; //thickness of a circle
                             var nr_of_segments = radial.length;
                             var nr_of_levels = horizontal.length;
-                            var origin_x = 200; // distance to the right from left top
+                            var origin_x = 10; // distance to the right from left top
                             var origin_y = 1; // distance from the top from left top
 
                             var rings = d3.scale.linear().domain([0, horizontal.length + 1]).range([0, radius])
@@ -125,88 +125,158 @@ module TechRadar {
                             var _origin_x_offset = origin_x + radius;
                             var _origin_y_offset = origin_y + radius;
                             var segment = d3.scale.linear().domain([0, nr_of_segments]).range([start_angle, end_angle]);
+                            // var width = _origin_x_offset * 2;
+                            // var height = _origin_y_offset * 2;
 
 
-                            //console.log(segment(4));
+                            var margin = { left: 20, top: 20, right: 20, bottom: 20 };
+                            var width = Math.min(screenWidth, 1200) - margin.left - margin.right;
+                            var height = Math.min(screenWidth, 1200) - margin.top - margin.bottom;
 
-                            var svg = d3.select(element[0])
-                                .append("svg")
-                                .attr("width", _origin_x_offset * 2)
-                                .attr("height", _origin_y_offset * 2)
-                                .append("g")
-                                .attr("transform", "translate(" + _origin_x_offset + "," + _origin_y_offset + ")");
+                            var svg = d3.select(element[0]).append("svg")
+                                .attr("width", (width + margin.left + margin.right))
+                                .attr("height", (height + margin.top + margin.bottom))
+                                .append("g").attr("class", "wrapper")
+                                .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
 
+                            var radial = scope.config.radial; // ["2016", "2017", "2018", "2019", "2020", "2021", "2022"];
+                            var horizontal = scope.config.horizontal; //["very low", "low", "neutral", "high", "very high"];
 
-                            for (var j = 0; j < nr_of_levels; j++) {
-                                radius = radius - (j + padding_rings);
-                                _outer_radius = radius;
-                                _inner_radius = radius - thickness;
-                                _start_angle = -0.5 * Math.PI;
-                                _end_angle = 0.5 * Math.PI;
+                            var step = 180 / nr_of_segments;
 
 
-                                for (var i = 0; i < nr_of_segments; i++) {
-                                    var arcId = 'arc' + i;
-                                    var arc = d3.svg.arc()
-                                        .innerRadius(_inner_radius)
-                                        .outerRadius(_outer_radius)
-                                        .startAngle(segment(i))
-                                        .endAngle(segment(i + 1));
+                            var minDepth = 0.25;
+                            var arcDepth = (0.95 - minDepth) / scope.config.horizontal.length;
+                            var arcWidth = width / 2 / horizontal.length * (0.95 - minDepth);
 
-                                    var arc2 = d3.svg.arc()
-                                        .innerRadius(_inner_radius)
-                                        .outerRadius(_outer_radius + 50)
-                                        .startAngle(segment(i))
-                                        .endAngle(segment(i + 1));
 
-                                    if (j == 0) {
-                                        svg.append('text')
-                                            .attr("transform", function () {
-                                                var pos = arc2.centroid();
-                                                pos[0] -= radial[i].length;
-                                                return "translate(" + pos + ")";
-                                            })
-                                            .text(() => { return radial[i]; });
-                                    };
+                            var first = true;
+                            var id = scope.config.horizontal.length;
+                            var mycolor = d3.rgb("#eee");
 
-                                    svg.append("path")
-                                        .attr("class", "arc")                                        
-                                        .attr("d", arc);
+                            scope.config.horizontal.forEach(h => {
+                                var segmentData = [];
+                                var start = 0;
 
-                                    var firstArcSection = /(^.+?)L/;
+                                scope.config.radial.forEach(r => {
+                                    segmentData.push({ title: r, startAngle: start, endAngle: start + step, items: [] });
+                                    start += step;
+                                });
 
-                                    //The [1] gives back the expression between the () (thus not the L as well) 
-                                    //which is exactly the arc statement
-                                    var newArc = firstArcSection.exec(d3.select(this).attr("d"))[1];
-                                    //Replace all the comma's so that IE can handle it -_-
-                                    //The g after the / is a modifier that "find all matches rather than stopping after the first match"
-                                    newArc = newArc.replace(/,/g, " ");
+                                var items = [];
+                                scope.config.items.forEach(i => {
+                                    var horValue = i.getDimensionValue(scope.config.activeConfig.horizontalDimension);
+                                    if (horValue === h) {
+                                        var radValue = i.getDimensionValue(scope.config.activeConfig.radialDimension);
+                                        var pos = scope.config.radial.indexOf(radValue);
+                                        if (pos !== -1) {
+                                            var segment = _.find(segmentData, (s => s.title === radValue));
+                                            if (segment) {
+                                                segment.items.push(i);
+                                                i._segment = segment;
+                                                i._segmentPos = pos;
+                                                i._segmentItemPos = segment.items.length;
+                                                items.push(i);
+                                            }
+                                        }
+                                    }
+                                });
 
-                                    //Create a new invisible arc that the text can flow along
-                                    svg.append("path")
-                                        .attr("class", "hiddenDonutArcs")
-                                        .attr("id", arcId)
-                                        .attr("d", newArc)
-                                        .style("fill", "none");
+                                var depth = ((arcDepth * id) + minDepth) / 2;
 
-                                    svg.append("text")
-                                        .append("textPath") //append a textPath to the text element
-                                        .attr("xlink:href", "#" + arcId) //place the ID of the path here
+                                //Creates a function that makes SVG paths in the shape of arcs with the specified inner and outer radius 
+                                var arc = d3.svg.arc()
+                                    .innerRadius(width * depth - arcWidth)
+                                    .outerRadius(width * depth);
+
+                                //Creates function that will turn the month data into start and end angles
+                                var pie = d3.layout.pie()
+                                    .value((d) => { return d.endAngle - d.startAngle; })
+                                    .startAngle(_start_angle)
+                                    .endAngle(_end_angle)
+                                    .sort(null);
+
+                                //Draw the arcs themselves
+                                svg.selectAll(".monthArc" + id)
+                                    .data(pie(segmentData))
+                                    .enter().append("path")
+                                    .attr("class", "segmentArc")
+                                    .attr("id", function (d, i) { return "monthArc_" + i; })
+                                    .style("fill", mycolor.toString())
+                                    .attr("d", arc);
+
+                                items.forEach((i: csComp.Services.RadarInput) => {
+
+                                    //console.log(i._segment.items.length);
+
+                                    var difS = 0;
+                                    var difE = 1;
+                                    if (i._segment.items.length > 1) { difS = difE = (i._segmentItemPos / i._segment.items.length) * 0.9; }
+
+                                    var segmentArc = d3.svg.arc()
+                                        .innerRadius(width * depth - arcWidth)
+                                        .outerRadius(width * depth)
+                                        .startAngle(segment(i._segmentPos + difS))
+                                        .endAngle(segment(i._segmentPos + difE));
+
+                                    var pos = segmentArc.centroid();
+
+                                    var circle = svg.append("circle")
+                                        .attr("cx", pos[0])
+                                        .attr("cy", pos[1])
+                                        .attr("r", 10)
+                                        .on("mousedown", () => {
+                                            bus.publish('radarinput','selected',i);
+                                        });
+
+                                    var text = svg.append("text")
+                                        .attr("x", pos[0])
+                                        .attr("y", pos[1] + 20)
+                                        .style("z-index", 100)
+                                        .attr("text-anchor", "middle")
+                                        .text(i.Technology);
+
+
+                                });
+
+                                if (first) {
+
+                                    //Append the month names within the arcs
+                                    svg.selectAll(".monthText")
+                                        .data(segmentData)
+                                        .enter().append("text")
+                                        .attr("class", "radialText")
                                         .style("text-anchor", "left") //place the text halfway on the arc
-                                        .attr("startOffset", "50%")
-                                        .attr("dy", -18)
-                                        .attr("dx", -50) //Move the text from the start angle of the arc
 
-                                        .text(() => { return radial[i]; });
+                                        .attr("x", 5) //Move the text from the start angle of the arc
+                                        .attr("dy", -11) //Move the text down
+                                        .append("textPath")
+
+                                        .attr("xlink:href", function (d, i) { return "#monthArc_" + i; })
+                                        .text(function (d) { return d.title; });
+
+                                    first = false;
                                 }
-                            }
+
+                                //arcPos -= (1 / scope.config.horizontal.length);
+                                mycolor = mycolor.darker(0.5 / scope.config.horizontal.length);
+
+
+                                id -= 1;
+
+
+
+                            });
+
+
+
                         }
 
                         bus.subscribe('filter', (a, e) => {
-                            if (a === 'updated') updateRadar();
+                            if (a === 'updated') update();
                         });
 
-                        updateRadar();
+
                     }
                 }
 

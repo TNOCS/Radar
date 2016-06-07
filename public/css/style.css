@@ -19,7 +19,7 @@ html, body, #map {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    background: linen;
+    background: white;
 }
 html, body, #container {
     height: 100%;
@@ -722,6 +722,22 @@ textarea {
     margin-left:100px; 
 }
 
+#chart{
+			text-align: center;
+		}
+		
+		.segmentArc {
+			fill: white;
+            stroke : gray;
+                        stroke-width: 0.5;			
+		}
+
+		.radialText {
+			fill: #6B6B6B;
+			font-size: 24px;
+            font-weight: 700;
+			font-family: 'Courgette', sans-serif;
+		}
   
          .arc {
             fill: red;

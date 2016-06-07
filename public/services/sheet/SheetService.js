@@ -47,6 +47,12 @@ var csComp;
                 this.Scores.push(new InputScore("Hype Cycle 2016", input));
                 this.Scores.push(new InputScore("Potential Impact", input));
             }
+            RadarInput.prototype.getDimensionValue = function (title) {
+                var score = _.find(this.Scores, function (s) { return s.Title === title; });
+                if (score)
+                    return score.Value;
+                return null;
+            };
             return RadarInput;
         }());
         Services.RadarInput = RadarInput;
@@ -69,7 +75,7 @@ var csComp;
             }
             SpreadsheetService.prototype.initConfig = function (config) {
                 config.Filters = [];
-                config.Filters.push(new Filter("Horizontal", "TRL", false));
+                config.Filters.push(new Filter("Horizontal", "Adoption", false));
                 config.Filters.push(new Filter("Radial", "Category", false));
                 config.Filters.push(new Filter("Color", "", false));
             };

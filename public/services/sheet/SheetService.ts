@@ -13,6 +13,8 @@ module csComp.Services {
     export class Config {
         public Title: string;
         public Filters: Filter[];
+        public horizontalDimension : string;
+        public radialDimension : string;
     }
 
 
@@ -52,6 +54,9 @@ module csComp.Services {
         Remarks: string;
         _Technology: ITechnology;
         _Examples: Example[];
+        _segment : any;
+        _segmentPos : number;
+        _segmentItemPos : number;
 
         constructor(input: any) {
             this.Technology = input.Technology;
@@ -64,8 +69,12 @@ module csComp.Services {
             this.Scores.push(new InputScore("Adoption 2016", input));
             this.Scores.push(new InputScore("Hype Cycle 2016", input));
             this.Scores.push(new InputScore("Potential Impact", input));
+        }
 
-
+        public getDimensionValue(title : string ) {
+            var score = _.find(this.Scores, s => { return s.Title === title; });
+            if (score) return score.Value;
+            return null;
         }
 
 
@@ -142,13 +151,12 @@ module csComp.Services {
         public activeConfig: Config;
         public presets: Config[];
         public horizontal : string[];
-        public radial : string[];
+        public radial : string[];        
         public items : RadarInput[];
 
         public initConfig(config: Config) {
-
             config.Filters = [];
-            config.Filters.push(new Filter("Horizontal", "TRL", false));
+            config.Filters.push(new Filter("Horizontal", "Adoption", false));
             config.Filters.push(new Filter("Radial", "Category", false));
             config.Filters.push(new Filter("Color", "", false));
         }
