@@ -719,7 +719,7 @@ textarea {
 
 #techRadar
 {
-    margin-left:100px; 
+     
 }
 
 #chart{
@@ -744,4 +744,16 @@ textarea {
             stroke: white;
             stroke-width: 3;
         }
+
+.viz-title
+{
+    font-size: 24px;
+    font-weight: 700;
+    margin-top:15px;
+}
+
+.viz-dimension
+{
+    font-size: 24px;
+}
      

@@ -92,10 +92,16 @@ module TechRadar {
                     },
                     link: (scope: ITechRadarChartScope, element, attrs) => {
 
+                        var c10 = d3.scale.category10();
+
                         var c = scope.config;
 
                         var update = () => {
+
+                            $(element[0]).empty();
                             var screenWidth = window.innerWidth;
+                            var screenHeight = window.innerHeight;
+                            
 
                             if (!scope.config.radial || !scope.config.horizontal) return;
                             var radial = scope.config.radial; // ["2016", "2017", "2018", "2019", "2020", "2021", "2022"];
@@ -129,9 +135,9 @@ module TechRadar {
                             // var height = _origin_y_offset * 2;
 
 
-                            var margin = { left: 20, top: 20, right: 20, bottom: 20 };
-                            var width = Math.min(screenWidth, 1200) - margin.left - margin.right;
-                            var height = Math.min(screenWidth, 1200) - margin.top - margin.bottom;
+                            var margin = { left: 350, top: 200, right: 100, bottom: 50 };
+                            var width = 1000; // Math.max(screenWidth, 900) - margin.left - margin.right;
+                            var height = 900; //Math.max(screenHeight, 600) - margin.top - margin.bottom;
 
                             var svg = d3.select(element[0]).append("svg")
                                 .attr("width", (width + margin.left + margin.right))
@@ -220,18 +226,36 @@ module TechRadar {
                                         .endAngle(segment(i._segmentPos + difE));
 
                                     var pos = segmentArc.centroid();
+                                    var color = "black";
+
+                                    if (scope.config.activeConfig.colorDimension) {
+                                        var colorValue = i.getDimensionValue(scope.config.activeConfig.colorDimension);
+                                        if (colorValue && scope.config.colors.indexOf(colorValue) !== -1) {
+                                            color = c10(scope.config.colors.indexOf(colorValue));
+                                        }
+                                    }
+
+                                    let size = 10;
+
+                                    if (scope.config.activeConfig.sizeDimension && scope.config.activeConfig.sizeDimension !== "-none-") {
+                                        var sizeValue = i.getDimensionValue(scope.config.activeConfig.sizeDimension);
+                                        if (sizeValue && scope.config.size.indexOf(sizeValue) !== -1) {
+                                            size = (20 / scope.config.size.length * scope.config.size.indexOf(sizeValue)) + 5;
+                                        }
+                                    }
 
                                     var circle = svg.append("circle")
                                         .attr("cx", pos[0])
                                         .attr("cy", pos[1])
-                                        .attr("r", 10)
+                                        .attr("r", size)
+                                        .style("fill", color.toString())
                                         .on("mousedown", () => {
-                                            bus.publish('radarinput','selected',i);
+                                            bus.publish('radarinput', 'selected', i);
                                         });
 
                                     var text = svg.append("text")
                                         .attr("x", pos[0])
-                                        .attr("y", pos[1] + 20)
+                                        .attr("y", pos[1] + size + 15)
                                         .style("z-index", 100)
                                         .attr("text-anchor", "middle")
                                         .text(i.Technology);

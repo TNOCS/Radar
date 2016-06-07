@@ -16,8 +16,7 @@
 
     <div class="container-fluid" style="padding: 0 0 0 0">
         <div>
-            <tech-radar-chart id="techRadar" config="vm.data" searchterm="searchText" prioritylevel="tech.priority" options="vm.options" startangle="-90"
-                endangle="270" style="position:absolute;left:300px;right:0;top:100px;bottom:0"></tech-radar-chart>
+            <tech-radar-chart id="techRadar" config="vm.data" style="position:absolute;left:0px;right:0;top:0px;bottom:0px"></tech-radar-chart>
         </div>
         <!--<div class="col-md-6" style="background:#bdbdbd;margin:0;width:55%;height:100%;padding:0">
             <infoSlide></infoSlide>
@@ -61,11 +60,19 @@
                     <div class="tab-content ">
                         <div class="tab-pane active" id="config">
                             <h1>Filter</h1>
-                            <div>User : Makers</div>                            
+                            <div ng-repeat="f in vm.data.activeConfig.Filters">
+                                <div class="viz-title">{{f.Visual}}</div>
+                                <select class="viz-dimension" name="repeatSelect" id="repeatSelect" ng-model="f.Dimension" ng-change="vm.reload()">
+      <option ng-repeat="dimension in vm.data.sheets.Dimensions" value="{{dimension}}">{{dimension}}</option>
+    </select>
+                            </div>
 
                             <h1>Visualisation</h1>
-                            <div ng-repeat="f in vm.data.activeConfig.Filters">                                
-                                <div>{{f.Visual}} : {{f.Dimension}}</div>                                
+                            <div ng-repeat="f in vm.data.activeConfig.Visualisation">
+                                <div class="viz-title">{{f.Visual}}</div>
+                                <select class="viz-dimension" name="repeatSelect" id="repeatSelect" ng-model="f.Dimension" ng-change="vm.reload()">
+      <option ng-repeat="dimension in vm.data.sheets.Dimensions" value="{{dimension}}">{{dimension}}</option>
+    </select>
                             </div>
                             <!--<button ng-click="vm.addFilter()">Add Filter</button>-->
                         </div>
@@ -130,7 +137,7 @@
                         <div class="infoHeader">Category</div>
                         <div class="infoCategoryCategory">{{selectedTechnology._Category.Category}}</div>
                         <div class="infoTechnologyDescription">{{selectedTechnology._Category.Description}}</div>
-                                                <div class="infoHeader">Sub Category</div>
+                        <div class="infoHeader">Sub Category</div>
                         <div class="infoCategoryCategory">{{selectedTechnology._SubCategory.SubCategory}}</div>
                         <div class="infoTechnologyDescription">{{selectedTechnology._SubCategory.Description}}</div>
                         <div class="infoHeader">Domain</div>
@@ -138,8 +145,8 @@
 
                         <div ng-repeat="ri in selectedTechnology._RadarInput">
                             {{ri.Users}}
-                            </div>
-                        
+                        </div>
+
 
 
                     </div>

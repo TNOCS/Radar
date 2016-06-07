@@ -37,6 +37,7 @@ module App {
             $scope.leftPanelVisible = true;
 
 
+
             this.options = { prio: { 1: true, 2: true, 3: false } };
             busService.subscribe('technology', (action: string, t: csComp.Services.ITechnology) => {
                 switch (action) {
@@ -51,7 +52,7 @@ module App {
                 this.reload();
             });
 
-             busService.subscribe('radarinput', (action: string, ri: csComp.Services.RadarInput) => {
+            busService.subscribe('radarinput', (action: string, ri: csComp.Services.RadarInput) => {
                 switch (action) {
                     case 'selected':
                         this.selectRadarInput(ri);
@@ -74,7 +75,7 @@ module App {
             this.activeExample = e;
         }
 
-        public selectRadarInput(ri : csComp.Services.RadarInput) {
+        public selectRadarInput(ri: csComp.Services.RadarInput) {
             console.log(ri);
         }
 
@@ -96,7 +97,7 @@ module App {
             var res: string[] = [];
             this.data.items.forEach(ri => {
                 var s = _.find(ri.Scores, { Title: dim });
-                if (s.Value!=='') if (s && res.indexOf(s.Value) === -1) res.push(s.Value);
+                if (s && s.Value !== '') if (s && res.indexOf(s.Value) === -1) res.push(s.Value);
             });
             return res;
         }
@@ -107,7 +108,7 @@ module App {
             this.data.sheets.RadarInput.forEach(ri => {
                 if (ri.getDimensionValue("Users") === "Makers") this.data.items.push(ri);
             });
-            this.data.activeConfig.Filters.forEach(f => {
+            this.data.activeConfig.Visualisation.forEach(f => {
                 switch (f.Visual) {
                     case 'Horizontal':
                         this.data.horizontal = this.getDimensions(f.Dimension);
@@ -117,9 +118,17 @@ module App {
                         this.data.radial = this.getDimensions(f.Dimension);
                         this.data.activeConfig.radialDimension = f.Dimension;
                         break;
+                    case 'Color':
+                        this.data.colors = this.getDimensions(f.Dimension);
+                        this.data.activeConfig.colorDimension = f.Dimension;
+                        break;
+                    case 'Size':
+                        this.data.size = this.getDimensions(f.Dimension);
+                        this.data.activeConfig.sizeDimension = f.Dimension;
+                        break;
                 }
             });
-            this.busService.publish('filter','updated');
+            this.busService.publish('filter', 'updated');
 
         }
 
