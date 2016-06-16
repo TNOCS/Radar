@@ -1,6 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/tnocs/techradar.png?label=ready&title=Ready)](https://waffle.io/tnocs/techradar)
-# TrendRadar
-A trend radar that uses a [Google Sheet]
+# Tech Radar
+A tech radar that uses a [Google Sheet]
 
 ## Features
 
